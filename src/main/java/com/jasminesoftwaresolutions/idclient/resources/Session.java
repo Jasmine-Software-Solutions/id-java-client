@@ -3,16 +3,15 @@ package com.jasminesoftwaresolutions.idclient.resources;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.jasminesoftwaresolutions.idclient.IDClient;
+import com.jasminesoftwaresolutions.idclient.IDResponses;
 import com.jasminesoftwaresolutions.idclient.exceptions.UnexpectedResponseException;
 import com.jasminesoftwaresolutions.idclient.flows.ResourceOwnerAuthorizationFlow;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
 
 public record Session(
@@ -79,12 +78,16 @@ public record Session(
                             throw new UnexpectedResponseException(body, "JSON Object", ex);
                         }
                     })
-                    .thenApply(body -> new Session(
-                            body.get("access_token").getAsString(),
-                            refreshToken,
-                            Instant.now().plusSeconds(body.get("expires_in").getAsLong()),
-                            Instant.now().plusSeconds(body.get("refresh_token_expires_in").getAsLong())
-                    ));
+                    .thenApply(body -> {
+                        String newRefreshToken = IDResponses.getAsStringOrNull(body, "refresh_token");
+
+                        return new Session(
+                                body.get("access_token").getAsString(),
+                                newRefreshToken != null ? newRefreshToken : refreshToken,
+                                Instant.now().plusSeconds(body.get("expires_in").getAsLong()),
+                                Instant.now().plusSeconds(body.get("refresh_token_expires_in").getAsLong())
+                        );
+                    });
         });
     }
 }
