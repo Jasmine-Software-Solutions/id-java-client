@@ -35,7 +35,7 @@ public class ResourceOwnerAuthorizationFlow {
             IDClient client,
             URI callbackUri,
             String code) {
-        URI endpointPath = client.getProvider().getEndpointPath("/oauth2/token");
+        URI endpointPath = client.getProvider().getEndpointPath("/api/v1/oauth2/token");
 
         String queryString = "?code=" + code;
         queryString += "&client_id=" + client.getId();

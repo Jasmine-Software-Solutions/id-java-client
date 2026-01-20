@@ -14,24 +14,27 @@ public class IDProvider {
             .registerTypeAdapter(Instant.class, (JsonDeserializer<Instant>) (json, typeOfT, context) -> Instant.ofEpochMilli(json.getAsLong()))
             .create();
 
-    private final URI baseUrl;
+    private final URI frontendUrl;
+    private final URI apiUrl;
 
-    public IDProvider(URI baseUrl) {
-        this.baseUrl = baseUrl;
+    public IDProvider(URI frontendUrl, URI apiUrl) {
+        this.frontendUrl = frontendUrl;
+        this.apiUrl = apiUrl;
     }
 
-    public IDProvider(String baseUrl) {
-        if (baseUrl.endsWith("/"))
-            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-
-        this.baseUrl = URI.create(baseUrl);
+    public IDProvider(String frontendUrl, String apiUrl) {
+        this.frontendUrl = normalizeUri(frontendUrl);
+        this.apiUrl = normalizeUri(apiUrl);
     }
 
     public URI getEndpointPath(String path) {
         if (!path.startsWith("/"))
             path = "/" + path;
 
-        return URI.create(baseUrl.toString() + path);
+        if (!path.startsWith("/api"))
+            return URI.create(frontendUrl.toString() + path);
+
+        return URI.create(apiUrl.toString() + path);
     }
 
     public HttpClient getHttpClient() {
@@ -40,5 +43,12 @@ public class IDProvider {
 
     public Gson getGson() {
         return GSON;
+    }
+
+    private static URI normalizeUri(String path) {
+        if (path.endsWith("/"))
+            path = path.substring(0, path.length() - 1);
+
+        return URI.create(path);
     }
 }

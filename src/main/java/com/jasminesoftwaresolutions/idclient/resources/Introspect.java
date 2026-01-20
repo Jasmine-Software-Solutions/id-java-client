@@ -22,7 +22,7 @@ public record Introspect(
         Instant iat
 ) {
     public static CompletableFuture<Introspect> introspectTokenWithToken(IDClient client, String token, String authenticatingToken) {
-        URI endpointUri = client.getProvider().getEndpointPath("/oauth2/introspect?token=" + token);
+        URI endpointUri = client.getProvider().getEndpointPath("/api/v1/oauth2/introspect?token=" + token);
 
         HttpClient httpClient = client.getProvider().getHttpClient();
         HttpRequest request = HttpRequest.newBuilder()

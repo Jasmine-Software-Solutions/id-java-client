@@ -58,7 +58,7 @@ public record Session(
 
     public static CompletableFuture<Session> requestWithRefreshToken(IDClient client, String refreshToken) {
         return client.requestApiToken().thenCompose(token -> {
-            URI endpointUri = client.getProvider().getEndpointPath("/oauth2/token");
+            URI endpointUri = client.getProvider().getEndpointPath("/api/v1/oauth2/token");
 
             String queryString = "?grant_type=refresh_token&refresh_token=" + refreshToken;
             endpointUri = URI.create(endpointUri + queryString);

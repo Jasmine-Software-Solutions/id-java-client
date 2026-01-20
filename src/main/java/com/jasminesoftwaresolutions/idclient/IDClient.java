@@ -31,7 +31,7 @@ public class IDClient {
     public CompletableFuture<String> requestApiToken() {
         HttpClient client = provider.getHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .GET().uri(provider.getEndpointPath("/oauth2/token?grant_type=client_credentials"))
+                .GET().uri(provider.getEndpointPath("/api/v1/oauth2/token?grant_type=client_credentials"))
                 .header("Authorization", getClientCredentials())
                 .build();
 
