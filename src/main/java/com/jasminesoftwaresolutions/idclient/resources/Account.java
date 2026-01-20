@@ -54,4 +54,33 @@ public record Account(
                     return new Account(id, firstName, lastName, email, createdAt, systemAdmin);
                 });
     }
+
+    public static CompletableFuture<Account> requestAccountDetailsWithSession(IDClient client, Session session, UUID id) {
+        URI endpointUri = client.getProvider().getEndpointPath("/api/v1/accounts/" + id);
+
+        HttpClient httpClient = client.getProvider().getHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET().uri(endpointUri)
+                .header("Authorization", "Bearer " + session.accessToken())
+                .build();
+
+        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenApply(body -> {
+                    try {
+                        return JsonParser.parseString(body).getAsJsonObject();
+                    } catch (JsonSyntaxException ex) {
+                        throw new UnexpectedResponseException(body, "JSON Object", ex);
+                    }
+                })
+                .thenApply(body -> {
+                    String firstName = IDResponses.getAsStringOrNull(body, "first_name");
+                    String lastName = IDResponses.getAsStringOrNull(body, "last_name");
+                    String email = IDResponses.getAsStringOrNull(body, "email");
+                    Instant createdAt = IDResponses.getAsInstantOrNull(body, "created_at");
+                    boolean systemAdmin = IDResponses.getAsBooleanOrFalse(body, "system_admin");
+
+                    return new Account(id, firstName, lastName, email, createdAt, systemAdmin);
+                });
+    }
 }
