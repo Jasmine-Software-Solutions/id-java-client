@@ -3,7 +3,9 @@ package com.jasminesoftwaresolutions.idclient;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.jasminesoftwaresolutions.idclient.exceptions.UnexpectedResponseException;
+import com.jasminesoftwaresolutions.idclient.flows.ClientCredentialsAuthorizationFlow;
 
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -28,10 +30,16 @@ public class IDClient {
         return "Basic " + Base64.getEncoder().encodeToString(decodedCredentials.getBytes());
     }
 
-    public CompletableFuture<String> requestApiToken() {
+    public CompletableFuture<String> requestApiToken(UUID tenant) {
+        return requestApiToken(tenant, null);
+    }
+
+    public CompletableFuture<String> requestApiToken(UUID tenant, String scope) {
+        URI endpointUri = ClientCredentialsAuthorizationFlow.getOAuth2TokenUri(this, tenant, scope);
+
         HttpClient client = provider.getHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .GET().uri(provider.getEndpointPath("/api/v1/oauth2/token?grant_type=client_credentials"))
+                .GET().uri(endpointUri)
                 .header("Authorization", getClientCredentials())
                 .build();
 

@@ -18,6 +18,7 @@ public record Introspect(
         String tokenType,
         String scope,
         String clientId,
+        String tenantId,
         Instant exp,
         Instant iat
 ) {
@@ -45,10 +46,11 @@ public record Introspect(
                     String tokenType = IDResponses.getAsStringOrNull(body, "token_type");
                     String scope = IDResponses.getAsStringOrNull(body, "scope");
                     String clientId = IDResponses.getAsStringOrNull(body, "client_id");
+                    String tenantId = IDResponses.getAsStringOrNull(body, "tenant_id");
                     Instant exp = IDResponses.getAsInstantOrNull(body, "exp");
                     Instant iat = IDResponses.getAsInstantOrNull(body, "iat");
 
-                    return new Introspect(active, tokenType, scope, clientId, exp, iat);
+                    return new Introspect(active, tokenType, scope, clientId, tenantId, exp, iat);
                 });
     }
 } 
