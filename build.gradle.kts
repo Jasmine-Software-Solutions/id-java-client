@@ -3,6 +3,12 @@ plugins {
     id("maven-publish")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(26))
+    }
+}
+
 group = "com.jasminesoftwaresolutions"
 version = "1.0.0-SNAPSHOT"
 
@@ -15,6 +21,12 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("com.google.code.gson:gson:2.13.1")
+
+    implementation("io.lettuce:lettuce-core:6.4.0.RELEASE")
+
+    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-gson:0.13.0")
 }
 
 publishing {
@@ -23,7 +35,7 @@ publishing {
             from(components["java"])
         }
     }
-    
+
     repositories {
         maven {
             name = "GitHubPackages"
