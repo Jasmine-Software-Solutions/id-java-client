@@ -19,6 +19,9 @@ repositories {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    // Gradle 9 no longer puts the platform launcher on the test runtime
+    // classpath implicitly; without it the test task cannot start its executor.
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     implementation("com.google.code.gson:gson:2.13.1")
 
